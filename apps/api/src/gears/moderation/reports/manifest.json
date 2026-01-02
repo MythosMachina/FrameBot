@@ -1,0 +1,10 @@
+{
+  "key": "moderation.reports",
+  "name": "Reports",
+  "category": "Moderation",
+  "description": "Report intake and review flows.",
+  "version": "0.1.0",
+  "entry": "src/gears/moderation/reports/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

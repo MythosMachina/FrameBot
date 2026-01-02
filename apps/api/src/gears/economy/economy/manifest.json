@@ -1,0 +1,10 @@
+{
+  "key": "economy.economy",
+  "name": "Economy",
+  "category": "Economy",
+  "description": "Currency, balances, and economy stats.",
+  "version": "0.1.0",
+  "entry": "src/gears/economy/economy/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

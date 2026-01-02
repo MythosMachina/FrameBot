@@ -1,0 +1,10 @@
+{
+  "key": "media.trivia",
+  "name": "Trivia",
+  "category": "Media & Fun",
+  "description": "Trivia packs and game settings.",
+  "version": "0.1.0",
+  "entry": "src/gears/media/trivia/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

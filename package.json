@@ -1,0 +1,14 @@
+{
+  "name": "framebot",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "echo 'lint not configured yet'",
+    "format": "echo 'format not configured yet'"
+  }
+}

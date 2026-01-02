@@ -1,0 +1,10 @@
+{
+  "key": "logging.modlog",
+  "name": "Modlog",
+  "category": "Logging & Audit",
+  "description": "Moderation log routing and retention.",
+  "version": "0.1.0",
+  "entry": "src/gears/logging/modlog/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

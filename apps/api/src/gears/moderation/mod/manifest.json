@@ -1,0 +1,10 @@
+{
+  "key": "moderation.mod",
+  "name": "Mod",
+  "category": "Moderation",
+  "description": "Core moderation tools.",
+  "version": "0.1.0",
+  "entry": "src/gears/moderation/mod/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

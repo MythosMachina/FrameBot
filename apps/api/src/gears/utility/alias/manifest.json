@@ -1,0 +1,10 @@
+{
+  "key": "utility.alias",
+  "name": "Alias",
+  "category": "Utility",
+  "description": "Alias definitions for commands.",
+  "version": "0.1.0",
+  "entry": "src/gears/utility/alias/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

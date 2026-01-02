@@ -1,0 +1,10 @@
+{
+  "key": "moderation.warnings",
+  "name": "Warnings",
+  "category": "Moderation",
+  "description": "Warning thresholds and escalation rules.",
+  "version": "0.1.0",
+  "entry": "src/gears/moderation/warnings/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

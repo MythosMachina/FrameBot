@@ -1,0 +1,10 @@
+{
+  "key": "media.image",
+  "name": "Image",
+  "category": "Media & Fun",
+  "description": "Image manipulation and media utilities.",
+  "version": "0.1.0",
+  "entry": "src/gears/media/image/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

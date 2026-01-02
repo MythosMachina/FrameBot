@@ -1,0 +1,10 @@
+{
+  "key": "news.news",
+  "name": "News",
+  "category": "Administration",
+  "description": "Publish news posts from the panel or webhook.",
+  "version": "0.1.0",
+  "entry": "src/gears/news/news/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

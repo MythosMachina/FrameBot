@@ -1,0 +1,10 @@
+{
+  "key": "moderation.permissions",
+  "name": "Permissions",
+  "category": "Moderation",
+  "description": "Command permission rules and allowlists.",
+  "version": "0.1.0",
+  "entry": "src/gears/moderation/permissions/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

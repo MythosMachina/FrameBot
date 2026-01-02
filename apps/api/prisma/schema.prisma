@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum AutomatonStatus {
+  stopped
+  running
+  error
+}
+
+enum AutomatonMemberRole {
+  admin
+  moderator
+  viewer
+}
+
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum TicketPriority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum LogLevel {
+  info
+  warn
+  error
+}
+
+model User {
+  id           String      @id @default(cuid())
+  username     String      @unique
+  passwordHash String
+  role         UserRole    @default(user)
+  botLimit     Int         @default(0)
+  automatons   Automaton[]
+  sessions     Session[]
+  tickets      Ticket[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Automaton {
+  id            String                  @id @default(cuid())
+  ownerId       String
+  name          String
+  status        AutomatonStatus         @default(stopped)
+  desiredRunning Boolean                @default(false)
+  tokenCipher   String
+  tokenIv       String
+  tokenTag      String
+  guildId       String?
+  channelId     String?
+  owner         User                    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  gears         AutomatonGearAssignment[]
+  roleMappings  AutomatonRoleMapping[]
+  economyAccounts EconomyAccount[]
+  economyReminders EconomyReminder[]
+  newsPosts    NewsPost[]
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+
+  @@index([ownerId])
+}
+
+model Gear {
+  id          String                  @id @default(cuid())
+  key         String                  @unique
+  name        String
+  category    String
+  description String
+  modulePath  String
+  version     String
+  enabled     Boolean                 @default(true)
+  automatons  AutomatonGearAssignment[]
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+}
+
+model AutomatonGearAssignment {
+  id         String   @id @default(cuid())
+  automatonId String
+  gearId     String
+  enabled    Boolean  @default(true)
+  configJson Json
+  automaton  Automaton @relation(fields: [automatonId], references: [id], onDelete: Cascade)
+  gear       Gear      @relation(fields: [gearId], references: [id], onDelete: Cascade)
+
+  @@unique([automatonId, gearId])
+}
+
+model AutomatonRoleMapping {
+  id           String               @id @default(cuid())
+  automatonId  String
+  discordUserId String
+  roleType     AutomatonMemberRole
+  automaton    Automaton            @relation(fields: [automatonId], references: [id], onDelete: Cascade)
+  createdAt    DateTime             @default(now())
+
+  @@index([automatonId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  action     String
+  targetType String
+  targetId   String
+  createdAt  DateTime @default(now())
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Ticket {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  category    String?
+  adminReply  String?
+  status      TicketStatus   @default(open)
+  priority    TicketPriority @default(normal)
+  createdById String
+  createdBy   User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model LogEntry {
+  id        String   @id @default(cuid())
+  level     LogLevel
+  message   String
+  context   Json?
+  createdAt DateTime @default(now())
+}
+
+model EconomyAccount {
+  id            String   @id @default(cuid())
+  automatonId   String
+  guildId       String
+  discordUserId String
+  balance       Int      @default(0)
+  lastDailyAt   DateTime?
+  messageCount  Int      @default(0)
+  lastMessageRewardAt DateTime?
+  lastChatBonusAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  automaton Automaton @relation(fields: [automatonId], references: [id], onDelete: Cascade)
+
+  @@unique([automatonId, guildId, discordUserId])
+  @@index([automatonId])
+  @@index([guildId])
+}
+
+model EconomyReminder {
+  id            String   @id @default(cuid())
+  automatonId   String
+  guildId       String
+  discordUserId String
+  kind          String
+  note          String?
+  resolved      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  resolvedAt    DateTime?
+
+  automaton Automaton @relation(fields: [automatonId], references: [id], onDelete: Cascade)
+
+  @@index([automatonId])
+  @@index([guildId])
+  @@index([resolved])
+}
+
+model NewsPost {
+  id            String   @id @default(cuid())
+  automatonId   String
+  authorUserId  String?
+  channelId     String
+  title         String
+  body          String
+  imageUrl      String?
+  embedColor    String?
+  source        String   @default("panel")
+  discordMessageId String?
+  createdAt     DateTime @default(now())
+
+  automaton Automaton @relation(fields: [automatonId], references: [id], onDelete: Cascade)
+
+  @@index([automatonId])
+  @@index([channelId])
+}

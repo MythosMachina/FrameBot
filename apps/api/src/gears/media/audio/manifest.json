@@ -1,0 +1,10 @@
+{
+  "key": "media.audio",
+  "name": "Audio",
+  "category": "Media & Fun",
+  "description": "Audio playback and queue controls.",
+  "version": "0.1.0",
+  "entry": "src/gears/media/audio/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

@@ -1,0 +1,10 @@
+{
+  "key": "utility.general",
+  "name": "General",
+  "category": "Utility",
+  "description": "General utility commands.",
+  "version": "0.1.0",
+  "entry": "src/gears/utility/general/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

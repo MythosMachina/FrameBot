@@ -1,0 +1,10 @@
+{
+  "key": "moderation.mutes",
+  "name": "Mutes",
+  "category": "Moderation",
+  "description": "Temporary mute controls and policies.",
+  "version": "0.1.0",
+  "entry": "src/gears/moderation/mutes/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

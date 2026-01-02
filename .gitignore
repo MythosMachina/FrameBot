@@ -1,0 +1,35 @@
+node_modules/
+.pnpm-store/
+
+# Next.js / React build outputs
+.next/
+out/
+dist/
+build/
+
+# Logs
+*.log
+pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Env files
+.env
+.env.*
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Cache
+.turbo/
+.cache/
+.docs/
+docs/

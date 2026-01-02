@@ -1,0 +1,10 @@
+{
+  "key": "alerts.streams",
+  "name": "Streams",
+  "category": "Streaming & Alerts",
+  "description": "Stream alerts and notifications.",
+  "version": "0.1.0",
+  "entry": "src/gears/alerts/streams/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

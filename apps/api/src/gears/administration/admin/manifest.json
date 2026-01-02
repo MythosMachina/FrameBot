@@ -1,0 +1,10 @@
+{
+  "key": "administration.admin",
+  "name": "Admin",
+  "category": "Administration",
+  "description": "Policies, self-roles, and admin utilities.",
+  "version": "0.1.0",
+  "entry": "src/gears/administration/admin/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

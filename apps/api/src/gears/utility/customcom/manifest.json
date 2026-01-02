@@ -1,0 +1,10 @@
+{
+  "key": "utility.customcom",
+  "name": "Custom Commands",
+  "category": "Utility",
+  "description": "Custom command definitions and templates.",
+  "version": "0.1.0",
+  "entry": "src/gears/utility/customcom/index.mjs",
+  "permissions": [],
+  "enabled": false
+}

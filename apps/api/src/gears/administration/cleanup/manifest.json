@@ -1,0 +1,10 @@
+{
+  "key": "administration.cleanup",
+  "name": "Cleanup",
+  "category": "Administration",
+  "description": "Bulk cleanup and message maintenance.",
+  "version": "0.1.0",
+  "entry": "src/gears/administration/cleanup/index.mjs",
+  "permissions": [],
+  "enabled": false
+}
