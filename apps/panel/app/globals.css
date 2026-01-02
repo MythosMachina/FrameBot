@@ -345,6 +345,10 @@ h1 {
   gap: 18px;
 }
 
+.gear-layout {
+  grid-template-columns: minmax(220px, 320px) 1fr;
+}
+
 .grid .card.full {
   grid-column: 1 / -1;
 }
@@ -549,5 +553,9 @@ h1 {
 
   .user-nav {
     position: static;
+  }
+
+  .gear-layout {
+    grid-template-columns: 1fr;
   }
 }

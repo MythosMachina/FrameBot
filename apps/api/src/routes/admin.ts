@@ -11,7 +11,7 @@ import { prisma } from "../lib/prisma";
 import os from "node:os";
 import { encryptToken } from "../lib/crypto";
 import { logEvent } from "../lib/logs";
-import { startAutomaton, stopAutomaton } from "../runtime/automatonManager";
+import { restartAutomaton, startAutomaton, stopAutomaton } from "../runtime/automatonManager";
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -219,6 +219,14 @@ export async function adminRoutes(app: FastifyInstance) {
         where: { id: assignment.id },
         data: { configJson: body.config },
       });
+      const restartResult = await restartAutomaton(id);
+      if (!restartResult?.skipped) {
+        await logEvent("info", "Automaton restarted after gear config update", {
+          adminId: request.user.id,
+          automatonId: id,
+          gearKey,
+        });
+      }
       await logEvent("info", "Gear config updated by admin", {
         adminId: request.user.id,
         automatonId: id,

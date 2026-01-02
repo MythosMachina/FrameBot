@@ -29,6 +29,8 @@ type NewsPost = {
   source: string;
 };
 
+type AdminTab = "automod" | "policy";
+
 export default function UserGearDetailPage() {
   const router = useRouter();
   const params = useParams<{ key: string }>();
@@ -50,6 +52,8 @@ export default function UserGearDetailPage() {
   const [newsBusy, setNewsBusy] = useState(false);
   const [newsError, setNewsError] = useState<string | null>(null);
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([]);
+  const [badwordList, setBadwordList] = useState<string[]>([]);
+  const [adminTab, setAdminTab] = useState<AdminTab>("automod");
 
   useEffect(() => {
     if (!gearKey) return;
@@ -86,6 +90,9 @@ export default function UserGearDetailPage() {
         return;
       }
       setGear(found);
+      if (found.key !== "administration.admin") {
+        setAdminTab("automod");
+      }
 
       const autoRes = await fetch(`${getApiBase()}/user/automatons`, {
         credentials: "include",
@@ -116,6 +123,14 @@ export default function UserGearDetailPage() {
     const fields = getGearFields(gearKey, "user");
     const loadedValues = configToValues(fields, payload.config ?? {});
     setValues(loadedValues);
+    if (gearKey === "administration.admin") {
+      const raw = String(payload.config?.badwordKeywords ?? "");
+      const items = raw
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+      setBadwordList(items);
+    }
     if (gearKey === "economy.economy") {
       const raw = String(payload.config?.shopItems ?? "");
       const items = raw
@@ -151,6 +166,10 @@ export default function UserGearDetailPage() {
           [item.key, item.name, item.price, item.roleId || "", item.description || ""].join("|")
         );
       parsed.shopItems = lines.join("\n");
+    }
+    if (gearKey === "administration.admin") {
+      const lines = badwordList.map((value) => value.trim()).filter(Boolean);
+      parsed.badwordKeywords = lines.join("\n");
     }
     const res = await fetch(
       `${getApiBase()}/user/automatons/${selectedAutomaton}/gears/${encodeURIComponent(gearKey)}/config`,
@@ -237,6 +256,32 @@ export default function UserGearDetailPage() {
     setShopItems((prev) => prev.filter((_, idx) => idx !== index));
   };
 
+  const addBadword = () => {
+    setBadwordList((prev) => [...prev, ""]);
+  };
+
+  const updateBadword = (index: number, value: string) => {
+    setBadwordList((prev) => prev.map((item, idx) => (idx === index ? value : item)));
+  };
+
+  const removeBadword = (index: number) => {
+    setBadwordList((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const adminAutoModKeys = new Set([
+    "badwordMatchMode",
+    "badwordDmMessage",
+    "badwordExemptMods",
+    "badwordIgnoreRoleIds",
+    "badwordIgnoreUserIds",
+  ]);
+
+  const adminPolicyKeys = new Set([
+    "policyAutoWarnCount",
+    "policyAutoKickCount",
+    "policyAutoBanCount",
+  ]);
+
   return (
     <main className="panel">
       <PanelHeader
@@ -245,7 +290,7 @@ export default function UserGearDetailPage() {
         lede={gear ? gear.description : "Loading gear details..."}
       />
 
-      <section className="grid">
+      <section className="grid gear-layout">
         <div className="card">
           <h2>Gear Details</h2>
           {error ? <div className="error">{error}</div> : null}
@@ -255,16 +300,10 @@ export default function UserGearDetailPage() {
             <div className="list">
               <div className="list-row">
                 <div>
-                  <strong>Category</strong>
-                  <span className="muted">{gear.category}</span>
+                  <strong>{gear.category}</strong>
+                  <span className="muted">Key {gear.key}</span>
                 </div>
                 <span className="tag">{gear.enabled ? "Enabled" : "Disabled"}</span>
-              </div>
-              <div className="list-row">
-                <div>
-                  <strong>Key</strong>
-                  <span className="muted">{gear.key}</span>
-                </div>
               </div>
             </div>
           )}
@@ -272,6 +311,22 @@ export default function UserGearDetailPage() {
 
         <div className="card">
           <h2>Assignment</h2>
+          {gearKey === "administration.admin" ? (
+            <div className="chip-row">
+              <button
+                className={adminTab === "automod" ? "chip active" : "chip"}
+                onClick={() => setAdminTab("automod")}
+              >
+                AutoMod
+              </button>
+              <button
+                className={adminTab === "policy" ? "chip active" : "chip"}
+                onClick={() => setAdminTab("policy")}
+              >
+                Policies
+              </button>
+            </div>
+          ) : null}
           <div className="form-stack">
             <label className="field">
               <span>Automaton</span>
@@ -290,6 +345,8 @@ export default function UserGearDetailPage() {
                     setValues({});
                     setConfigError(null);
                     setNewsPosts([]);
+                    setShopItems([]);
+                    setBadwordList([]);
                   }
                 }}
               >
@@ -309,7 +366,23 @@ export default function UserGearDetailPage() {
                   )
                 : (
                   getGearFields(gearKey, "user")
-                    .filter((field) => !(gearKey === "economy.economy" && field.key === "shopItems"))
+                    .filter((field) => {
+                      if (gearKey === "economy.economy" && field.key === "shopItems") {
+                        return false;
+                      }
+                      if (gearKey === "administration.admin" && field.key === "badwordKeywords") {
+                        return false;
+                      }
+                      if (gearKey === "administration.admin") {
+                        if (adminTab === "automod") {
+                          return adminAutoModKeys.has(field.key);
+                        }
+                        if (adminTab === "policy") {
+                          return adminPolicyKeys.has(field.key);
+                        }
+                      }
+                      return true;
+                    })
                     .map((field) => {
                     const fieldValue = values[field.key] ?? (field.type === "checkbox" ? false : "");
                     if (field.type === "textarea") {
@@ -446,6 +519,51 @@ export default function UserGearDetailPage() {
                 <button className="button ghost" onClick={addShopItem}>
                   Add shop item
                 </button>
+              </div>
+            ) : null}
+            {gearKey === "administration.admin" ? (
+              <div className="card full">
+                {adminTab === "automod" ? (
+                  <>
+                    <h2>Badword Keywords</h2>
+                    {badwordList.length === 0 ? (
+                      <p>No keywords yet.</p>
+                    ) : (
+                      <div className="list">
+                        {badwordList.map((item, index) => (
+                          <div className="list-row" key={`badword-${index}`}>
+                            <div className="form-stack" style={{ flex: 1 }}>
+                              <label className="field">
+                                <span>Keyword</span>
+                                <input
+                                  className="input"
+                                  value={item}
+                                  onChange={(event) => updateBadword(index, event.target.value)}
+                                />
+                              </label>
+                            </div>
+                            <div className="row-actions">
+                              <button className="button ghost" onClick={() => removeBadword(index)}>
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button className="button ghost" onClick={addBadword}>
+                      Add keyword
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h2>Policies</h2>
+                    <p className="muted">
+                      Policy automation will expand over time. Use these thresholds to define when
+                      actions should trigger based on badword counts.
+                    </p>
+                  </>
+                )}
               </div>
             ) : null}
             {gearKey === "news.news" ? (
