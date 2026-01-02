@@ -1,5 +1,5 @@
 import { parentPort, workerData } from "node:worker_threads";
-import { Client, GatewayIntentBits, Partials } from "discord.js";
+import { Client, GatewayIntentBits, Partials, PermissionsBitField } from "discord.js";
 
 const { automatonId, token, guildId, gears } = workerData;
 
@@ -9,6 +9,7 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.MessageContent,
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
@@ -75,6 +76,84 @@ client.once("ready", async () => {
     await ensureCommand({
       name: "frameforgetest",
       description: "Check if the automaton is ready.",
+    });
+    await ensureCommand({
+      name: "badwordcount",
+      description: "Review keyword moderation counts.",
+      dm_permission: false,
+      default_member_permissions: PermissionsBitField.Flags.ManageMessages.toString(),
+      options: [
+        {
+          type: 1,
+          name: "user",
+          description: "Show badword count for a user.",
+          options: [
+            {
+              type: 6,
+              name: "user",
+              description: "User to inspect.",
+              required: true,
+            },
+          ],
+        },
+        {
+          type: 1,
+          name: "top",
+          description: "Show top badword counts.",
+          options: [
+            {
+              type: 4,
+              name: "limit",
+              description: "Number of users to show (max 25).",
+              required: false,
+            },
+          ],
+        },
+      ],
+    });
+    await ensureCommand({
+      name: "badwords",
+      description: "Manage badword keywords.",
+      dm_permission: false,
+      default_member_permissions: PermissionsBitField.Flags.ManageMessages.toString(),
+      options: [
+        {
+          type: 1,
+          name: "add",
+          description: "Add a keyword or phrase.",
+          options: [
+            {
+              type: 3,
+              name: "keyword",
+              description: "Keyword or phrase to add.",
+              required: true,
+            },
+          ],
+        },
+        {
+          type: 1,
+          name: "remove",
+          description: "Remove a keyword or phrase.",
+          options: [
+            {
+              type: 3,
+              name: "keyword",
+              description: "Keyword or phrase to remove.",
+              required: true,
+            },
+          ],
+        },
+        {
+          type: 1,
+          name: "list",
+          description: "List configured keywords.",
+        },
+        {
+          type: 1,
+          name: "clear",
+          description: "Remove all keywords.",
+        },
+      ],
     });
   } catch (err) {
     parentPort?.postMessage({ type: "error", automatonId, error: String(err) });

@@ -103,6 +103,14 @@ export async function startAutomaton(automatonId: string) {
   return { started: true };
 }
 
+export async function restartAutomaton(automatonId: string) {
+  if (!workers.has(automatonId)) {
+    return { skipped: true };
+  }
+  await stopAutomaton(automatonId);
+  return startAutomaton(automatonId);
+}
+
 function toGearUrl(modulePath: string) {
   if (modulePath.startsWith("file:")) {
     return modulePath;

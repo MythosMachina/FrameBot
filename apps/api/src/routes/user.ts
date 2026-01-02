@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import { encryptToken } from "../lib/crypto";
 import { logEvent } from "../lib/logs";
-import { startAutomaton, stopAutomaton } from "../runtime/automatonManager";
+import { restartAutomaton, startAutomaton, stopAutomaton } from "../runtime/automatonManager";
 import {
   getBotProfile,
   listGuildChannels,
@@ -209,6 +209,14 @@ export async function userRoutes(app: FastifyInstance) {
         where: { id: assignment.id },
         data: { configJson: body.config },
       });
+      const restartResult = await restartAutomaton(id);
+      if (!restartResult?.skipped) {
+        await logEvent("info", "Automaton restarted after gear config update", {
+          userId: request.user.id,
+          automatonId: id,
+          gearKey,
+        });
+      }
       await logEvent("info", "Gear config updated by user", {
         userId: request.user.id,
         automatonId: id,
@@ -240,6 +248,14 @@ export async function userRoutes(app: FastifyInstance) {
           enabled: true,
           configJson: {},
         },
+      });
+    }
+
+    const restartResult = await restartAutomaton(id);
+    if (!restartResult?.skipped) {
+      await logEvent("info", "Automaton restarted after gear assignment update", {
+        userId: request.user.id,
+        automatonId: id,
       });
     }
 

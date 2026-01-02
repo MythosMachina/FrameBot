@@ -74,6 +74,7 @@ model Automaton {
   economyAccounts EconomyAccount[]
   economyReminders EconomyReminder[]
   newsPosts    NewsPost[]
+  badWordCounts BadWordCount[]
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt
 
@@ -222,4 +223,20 @@ model NewsPost {
 
   @@index([automatonId])
   @@index([channelId])
+}
+
+model BadWordCount {
+  id            String   @id @default(cuid())
+  automatonId   String
+  discordUserId String
+  count         Int      @default(0)
+  lastMatchedAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  automaton Automaton @relation(fields: [automatonId], references: [id], onDelete: Cascade)
+
+  @@unique([automatonId, discordUserId])
+  @@index([automatonId])
+  @@index([discordUserId])
 }

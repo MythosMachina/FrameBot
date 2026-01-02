@@ -88,6 +88,10 @@ export default function UserWorkshopPage() {
     );
   };
 
+  const openInfo = (key: string) => {
+    router.push(`/user/gears/${encodeURIComponent(key)}/info`);
+  };
+
   const save = async () => {
     if (!selectedAutomaton) return;
     setBusy(true);
@@ -195,11 +199,15 @@ export default function UserWorkshopPage() {
                 const active = selected.includes(gear.id);
                 const available = gear.enabled;
                 return (
-                  <button
+                  <div
                     key={gear.id}
                     className={active ? "gear-card active" : "gear-card"}
-                    onClick={() => (available ? toggle(gear.id) : undefined)}
-                    disabled={!selectedAutomaton || !available}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openInfo(gear.key)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") openInfo(gear.key);
+                    }}
                   >
                     <div className="gear-meta">
                       <span className="tag">{gear.category}</span>
@@ -207,9 +215,23 @@ export default function UserWorkshopPage() {
                       <p>{gear.description}</p>
                     </div>
                     <div className="gear-toggle">
-                      {available ? <input type="checkbox" readOnly checked={active} /> : <span className="tag">Disabled</span>}
+                      {available ? (
+                        <button
+                          className="button ghost"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            if (!selectedAutomaton) return;
+                            toggle(gear.id);
+                          }}
+                          disabled={!selectedAutomaton}
+                        >
+                          {active ? "Remove" : "Add"}
+                        </button>
+                      ) : (
+                        <span className="tag">Disabled</span>
+                      )}
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
